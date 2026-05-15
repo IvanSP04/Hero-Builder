@@ -1,15 +1,22 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import { Link, useNavigate } from 'react-router'
+import { useAuth } from '../AuthContext'
 
 function Usuario() {
+  const { user, logout } = useAuth()
+  const navigate = useNavigate()
   const [nombre, setNombre] = useState('')
   const [heroeFav, setHeroeFav] = useState('')
   const [guardado, setGuardado] = useState(false)
 
+  const profileKey = user ? `hero-builder-profile-${user.username}` : 'hero-builder-profile-guest'
+
   useEffect(() => {
-    const datos = JSON.parse(localStorage.getItem('usuario') || '{}')
-    if (datos.nombre) setNombre(datos.nombre)
-    if (datos.heroeFav) setHeroeFav(datos.heroeFav)
-  }, [])
+    if (!user) return
+    const datos = JSON.parse(localStorage.getItem(profileKey) || '{}')
+    setNombre(datos.nombre || user.username)
+    setHeroeFav(datos.heroeFav || '')
+  }, [profileKey, user])
 
   const guardarDatos = () => {
     localStorage.setItem('usuario', JSON.stringify({ nombre, heroeFav }))
