@@ -1,10 +1,10 @@
-import { Link, useLocation, useNavigate } from 'react-router'
-import { useAuth } from '../AuthContext'
+import { Link, useLocation, useNavigate } from 'react-router';
+import { useAuth } from '../AuthContext';
 
 function Navbar() {
-  const location = useLocation()
-  const navigate = useNavigate()
-  const { user, logout } = useAuth()
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
 
   const tabs = [
     { path: '/', label: 'Home' },
@@ -12,13 +12,13 @@ function Navbar() {
     { path: '/builder', label: 'Builder' },
     { path: '/informativa', label: 'Info' },
     { path: '/peleas', label: 'Peleas' },
-    { path: '/usuario', label: user ? user.username : 'Usuario' },
-  ]
+    { path: '/usuario', label: user ? (user.email?.split('@')[0] ?? 'Usuario') : 'Usuario' },
+  ];
 
-  const handleLogout = () => {
-    logout()
-    navigate('/')
-  }
+  const handleLogout = async () => {
+    await logout();
+    navigate('/login');
+  };
 
   return (
     <nav className="navbar">
@@ -31,7 +31,9 @@ function Navbar() {
           >
             {tab.path === '/usuario' ? (
               <>
-                <span className="nav-icon">👤</span>
+                <span className="nav-icon">
+                  {user ? '🟢' : '🔴'}
+                </span>
                 {tab.label}
               </>
             ) : (
@@ -40,13 +42,17 @@ function Navbar() {
           </Link>
         ))}
       </div>
-      {user && (
+      {user ? (
         <button className="nav-logout" onClick={handleLogout}>
           Cerrar sesión
         </button>
+      ) : (
+        <Link to="/login" className="nav-login">
+          Iniciar sesión
+        </Link>
       )}
     </nav>
-  )
+  );
 }
 
-export default Navbar
+export default Navbar;

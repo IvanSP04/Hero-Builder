@@ -279,6 +279,133 @@ body {
   border-radius: 10px;
 }
 
+.navbar {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  background-color: #1a1a1a;
+  padding: 12px 14px;
+  border-top: 1px solid #333;
+  gap: 8px;
+}
+
+.navbar-links {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  width: 100%;
+}
+
+.nav-icon {
+  margin-right: 4px;
+}
+
+.nav-logout {
+  background-color: transparent;
+  color: #f0f0f0;
+  border: 1px solid #444;
+  padding: 6px 12px;
+  border-radius: 18px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.auth-page {
+  min-height: calc(100vh - 70px);
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.auth-card {
+  width: min(420px, 100%);
+  background-color: #111;
+  border: 1px solid #333;
+  border-radius: 16px;
+  padding: 22px;
+}
+
+.auth-card h2 {
+  margin-bottom: 16px;
+  font-size: 22px;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.auth-form label {
+  font-size: 13px;
+  color: #aaa;
+}
+
+.auth-form input {
+  padding: 10px 12px;
+  background-color: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 10px;
+  color: #f0f0f0;
+}
+
+.auth-form button {
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid #444;
+  background-color: #e63946;
+  color: #fff;
+  cursor: pointer;
+}
+
+.auth-error {
+  color: #e63946;
+  font-size: 13px;
+}
+
+.auth-switch {
+  margin-top: 14px;
+  color: #bbb;
+  font-size: 13px;
+}
+
+.auth-switch a {
+  color: #e63946;
+}
+
+.auth-links {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.auth-link-button {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background-color: #1a1a1a;
+  color: #f0f0f0;
+  border: 1px solid #444;
+  text-align: center;
+  text-decoration: none;
+}
+
+.logout-button {
+  margin-top: 14px;
+  background-color: #e63946;
+  color: #fff;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
 /* Peleas */
 .peleas-grid {
   display: grid;
