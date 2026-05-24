@@ -1,40 +1,103 @@
-import { useEffect, useState } from 'react'
-import { Link } from 'react-router'
-import type { Hero } from '../type'
+import { useEffect, useState } from 'react';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { db } from '../firebase/firebaseConfig';
+import { useAuth } from '../AuthContext';
+import { Link } from 'react-router';
+import type { Hero } from '../type';
 
-function Favoritos() {
-  const [heroes, setHeroes] = useState<Hero[]>([])
+export default function Favoritos() {
+  const { user } = useAuth();
+  const [heroes, setHeroes] = useState<Hero[]>([]);
+  const [cargando, setCargando] = useState(true);
 
   useEffect(() => {
-    const favoritos: number[] = JSON.parse(localStorage.getItem('favoritos') || '[]')
+    const cargarFavoritos = async () => {
+      try {
+        let ids: number[] = [];
 
-    if (favoritos.length === 0) return
+        if (user) {
+          const docRef = doc(db, 'usuarios', user.uid);
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            ids = docSnap.data().favoritos || [];
+          }
+        } else {
+          ids = JSON.parse(localStorage.getItem('favoritos') || '[]');
+        }
 
-    fetch('https://raw.githubusercontent.com/akabab/superhero-api/master/api/all.json')
-      .then((res) => res.json())
-      .then((data: Hero[]) => {
-        const heroesFav = data.filter((h) => favoritos.includes(h.id))
-        setHeroes(heroesFav)
-      })
-  }, [])
+        if (ids.length > 0) {
+          const res = await fetch(
+            'https://raw.githubusercontent.com/akabab/superhero-api/master/api/all.json'
+          );
+          const todos: Hero[] = await res.json();
+          const misFavoritos = todos.filter(h => ids.includes(h.id));
+          setHeroes(misFavoritos);
+        }
+      } catch (error) {
+        console.error('Error cargando favoritos:', error);
+      } finally {
+        setCargando(false);
+      }
+    };
+
+    cargarFavoritos();
+  }, [user]);
+
+  const quitarFavorito = async (id: number) => {
+    try {
+      if (user) {
+        const docRef = doc(db, 'usuarios', user.uid);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const favs: number[] = docSnap.data().favoritos || [];
+          await updateDoc(docRef, { favoritos: favs.filter(f => f !== id) });
+        }
+      } else {
+        const favs: number[] = JSON.parse(
+          localStorage.getItem('favoritos') || '[]'
+        );
+        localStorage.setItem(
+          'favoritos',
+          JSON.stringify(favs.filter(f => f !== id))
+        );
+      }
+      setHeroes(prev => prev.filter(h => h.id !== id));
+    } catch (error) {
+      console.error('Error quitando favorito:', error);
+    }
+  };
+
+  if (cargando) return <p className="cargando">Cargando favoritos...</p>;
 
   return (
-    <div className="tabla-container">
-      <h2>Favoritos</h2>
+    <div className="favoritos-container">
+      <h1>⭐ Mis Favoritos</h1>
       {heroes.length === 0 ? (
-        <p>No tienes heroes favoritos</p>
+        <div className="sin-favoritos">
+          <p>No tienes héroes favoritos aún.</p>
+          <Link to="/">Explorar héroes</Link>
+        </div>
       ) : (
         <div className="heroes-grid">
-          {heroes.map((heroe) => (
-            <Link to={`/heroe/${heroe.id}`} key={heroe.id} className="heroe-card">
-              <img src={heroe.images.sm} alt={heroe.name} />
-              <p>{heroe.name}</p>
-            </Link>
+          {heroes.map(heroe => (
+            <div key={heroe.id} className="heroe-card">
+              <Link to={`/heroe/${heroe.id}`}>
+                <img src={heroe.images.sm} alt={heroe.name} />
+                <h3>{heroe.name}</h3>
+                <span className={`alignment ${heroe.biography.alignment}`}>
+                  {heroe.biography.alignment}
+                </span>
+              </Link>
+              <button
+                className="btn-quitar"
+                onClick={() => quitarFavorito(heroe.id)}
+              >
+                Quitar
+              </button>
+            </div>
           ))}
         </div>
       )}
     </div>
-  )
+  );
 }
-
-export default Favoritos
